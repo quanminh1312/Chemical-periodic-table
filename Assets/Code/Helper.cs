@@ -11,6 +11,7 @@ public static class Helper
     public static  List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
     public static string[] headers;
     public static List<string> elementsGroup = new List<string>() { "IA", "IIA", "IIIB", "IVB", "VB", "VIB", "VIIB", "VIIIB", "VIIIB", "VIIIB", "IB", "IIB", "IIIA", "IVA", "VA", "VIA", "VIIA", "VIIIA", };
+    public static List<string> lNumber = new List<string>() {"s","p", "d", "f" };
     public static void ReadCSVFile()
     {
         TextAsset tableData = Resources.Load("PeriodicTableCSV") as TextAsset;

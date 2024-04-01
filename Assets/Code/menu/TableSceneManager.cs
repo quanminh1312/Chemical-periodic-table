@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -76,7 +77,7 @@ namespace Assets.Code.menu
             CreateCategoryHeader();
             inputField.onValueChanged.AddListener(OnSearch);
             toggle.onValueChanged.AddListener(OnToggle);
-            keys.text = "                      " + string.Join(", ", Helper.headers.Take(27));
+            keys.text = "                      " + string.Join(", ", Helper.headers.Take(27)) +", n_l_ml_ms";
         }
         void OnToggle(bool bol)
         {
@@ -98,17 +99,18 @@ namespace Assets.Code.menu
                 if (val.Count >= 3 && (val[1] == "=" || val[1] == ":"))
                 {
                     string valueToSearch = string.Join(" ", val.Skip(2).Select(s => s.ToUpper()));
+                    val[0] = val[0].ToLower();
                     if (val[0] == "group")
                     {
                         List<string> tags = Helper.elementsGroup;
                         if (toggle.isOn)
                             data = data.Where(dict => dict.Any(kvp =>
                             {
-                                if (!kvp.Key.Contains(val[0])) return false;
+                                if (!kvp.Key.ToLower().Contains(val[0])) return false;
                                 int temp = int.Parse(kvp.Value);
                                 if (tags[int.Parse(kvp.Value) - 1].ToString().Contains(valueToSearch)) return true;
                                 int tmp = int.Parse(kvp.Value) > 10 ? int.Parse(kvp.Value) - 10 : Math.Clamp(int.Parse(kvp.Value), 1, 8);
-                                if (valueToSearch[valueToSearch.Length-1] == 'A' || valueToSearch[valueToSearch.Length - 1] == 'B')
+                                if (valueToSearch[valueToSearch.Length - 1] == 'A' || valueToSearch[valueToSearch.Length - 1] == 'B')
                                 {
                                     if (!tmp.ToString().Contains(valueToSearch.Substring(0, valueToSearch.Length - 1))) return false;
                                     if (valueToSearch[valueToSearch.Length - 1] == 'A' && (temp > 12 || temp < 3)) return true;
@@ -124,7 +126,7 @@ namespace Assets.Code.menu
                         else
                             data = data.Where(dict => dict.Any(kvp =>
                             {
-                                if (!kvp.Key.Contains(val[0])) return false;
+                                if (!kvp.Key.ToLower().Contains(val[0])) return false;
                                 int temp = int.Parse(kvp.Value);
                                 if (tags[int.Parse(kvp.Value) - 1].ToString().Equals(valueToSearch)) return true;
                                 int tmp = int.Parse(kvp.Value) > 10 ? int.Parse(kvp.Value) - 10 : Math.Clamp(int.Parse(kvp.Value), 1, 8);
@@ -142,12 +144,46 @@ namespace Assets.Code.menu
                             }
                              )).ToList();
                     }
+                    else if (val[0] == "n_l_ml_ms")
+                    {
+                        List<string> lNumber = Helper.lNumber;
+                        List<string> searchs = valueToSearch.ToLower().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                        if (searchs.Count !=4) continue;
+                        string search = searchs[0] + searchs[1];
+                        int lNum = lNumber.IndexOf(searchs[1]);
+                        if (int.TryParse(searchs[0], out int g) && int.TryParse(searchs[2], out int gg) && lNum != -1)
+                        {
+                            int ml = 1 + lNum * 2;
+                            if (searchs[3][0] == '+') search = search + (lNum + 1 + int.Parse(searchs[2]));
+                            else if (searchs[3][0] == '-') search = search + (ml + lNum + 1 + int.Parse(searchs[2]));
+                            data = data.Where(dict =>
+                            {
+                                if (toggle.isOn)
+                                {
+                                    if (dict["electron_configuration"]
+                                        .ToLower()
+                                        .Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries)
+                                        .Any(s => s[..2] == search[..2] && int.Parse(s[2..]) >= int.Parse(search[2..]))
+                                        ) return true;
+                                }
+                                else
+                                {
+                                    if (dict["electron_configuration"]
+                                        .ToLower()
+                                        .Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries)
+                                        .Any(s => s == search)
+                                        ) return true;
+                                }
+                                return false;
+                            }).ToList();
+                        }
+                    }
                     else
                     {
                         if (toggle.isOn)
-                            data = data.Where(dict => dict.Any(kvp => (kvp.Key.Contains(val[0]) && kvp.Value.ToUpper().Contains(valueToSearch)))).ToList();
+                            data = data.Where(dict => dict.Any(kvp => (kvp.Key.ToLower().Contains(val[0]) && kvp.Value.ToUpper().Contains(valueToSearch)))).ToList();
                         else
-                            data = data.Where(dict => dict.Any(kvp => (kvp.Key.Contains(val[0]) && kvp.Value.ToUpper() == valueToSearch))).ToList();
+                            data = data.Where(dict => dict.Any(kvp => (kvp.Key.ToLower().Contains(val[0]) && kvp.Value.ToUpper() == valueToSearch))).ToList();
                     }
                 }
             }
