@@ -168,11 +168,8 @@ namespace Assets.Code.menu
                                 }
                                 else
                                 {
-                                    if (dict["electron_configuration"]
-                                        .ToLower()
-                                        .Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries)
-                                        .Any(s => s == search)
-                                        ) return true;
+                                    List<string> config = dict["electron_configuration"].ToLower().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).ToList();                                        
+                                    if (config[config.Count-1] == search) return true;
                                 }
                                 return false;
                             }).ToList();
