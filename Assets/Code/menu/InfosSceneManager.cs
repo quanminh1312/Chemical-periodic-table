@@ -23,7 +23,16 @@ namespace Assets.Code
         {
             if (instance)
             {
-                Destroy(gameObject);
+                if (Application.isPlaying)
+                {
+                    // Chỉ hủy đối tượng trong Play Mode
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    // Sử dụng DestroyImmediate trong Edit Mode
+                    DestroyImmediate(gameObject);
+                }
                 return;
             }
             instance = this;

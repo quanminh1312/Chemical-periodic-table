@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace Assets.Code.menu
 {
-    internal class TableSceneManager :MonoBehaviour
+    public class TableSceneManager :MonoBehaviour
     {
         public static TableSceneManager Instance;
 
@@ -77,7 +77,8 @@ namespace Assets.Code.menu
             CreateCategoryHeader();
             inputField.onValueChanged.AddListener(OnSearch);
             toggle.onValueChanged.AddListener(OnToggle);
-            keys.text = "                      " + string.Join(", ", Helper.headers.Take(27)) +", n_l_ml_ms";
+            keys.text = "                      " + string.Join(", ", Helper.headers.Take(27)) +", n_l_ml_ms(Maximum Energy)";
+            data = Helper.data.ToList();
         }
         void OnToggle(bool bol)
         {
@@ -158,6 +159,7 @@ namespace Assets.Code.menu
                             else if (searchs[3][0] == '-') search = search + (ml + lNum + 1 + int.Parse(searchs[2]));
                             data = data.Where(dict =>
                             {
+                                if (lNum < Math.Abs(int.Parse(searchs[2]))) return false;
                                 if (toggle.isOn)
                                 {
                                     if (dict["electron_configuration"]
@@ -271,6 +273,23 @@ namespace Assets.Code.menu
                 KeyValuePair<string, Color> pair = bangTuanHoan.category.Where(p => p.Value == colors[i]).FirstOrDefault();
                 categoryHeader[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = pair.Key;
             }
+        }
+        public void ResetData()
+        {
+            data = null;
+        }
+        public void DeleteData()
+        {
+            data = new List<Dictionary<string, string>>();
+        }
+        public void DeleteNumberKey()
+        {
+            //delete number key from data
+            data = data.Select(dict =>
+            {
+                dict.Remove("number");
+                return dict;
+            }).ToList();
         }
     }
 }

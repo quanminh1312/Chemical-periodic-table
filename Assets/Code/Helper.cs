@@ -52,4 +52,9 @@ public static class Helper
     {
         InfosSceneManager.instance.ToggleInfoSceneManager(number);
     }
+    public static void ClearAllData()
+    {
+        data.Clear();
+        headers = null;
+    }
 }
